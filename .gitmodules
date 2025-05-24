@@ -1,0 +1,3 @@
+[submodule "src/lsp-plugins"]
+	path = src/lsp-plugins
+	url = https://github.com/lsp-plugins/lsp-plugins.git
