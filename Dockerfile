@@ -24,8 +24,10 @@ RUN apt-get update && apt-get install -y \
     php-curl \
     php-xml \
     php-mbstring \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+        libgstreamer1.0-dev \
+        libgstreamer-plugins-base1.0-dev \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*
     # Clone the current git repository with submodules
     RUN git clone --recurse-submodules https://github.com/solv-stoy-teknikk/lsp-docker /opt/lsp-docker
 
