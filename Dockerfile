@@ -1,0 +1,43 @@
+FROM debian:stable-slim
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    pkg-config \
+    git \
+    libsndfile1-dev \
+    libfftw3-dev \
+    libsamplerate0-dev \
+    libx11-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    libjack-jackd2-dev \
+    libasound2-dev \
+    libgtk-3-dev \
+    liblo-dev \
+    libcurl4-openssl-dev \
+    python3 \
+    python3-pip \
+    php \
+    php-cli \
+    php-curl \
+    php-xml \
+    php-mbstring \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+    # Clone the current git repository with submodules
+    RUN git clone --recurse-submodules . /opt/lsp-docker
+
+
+# Set working directory
+WORKDIR /opt/lsp-docker/src/lsp-plugins
+
+# Build the project
+RUN make config && \
+    make fetch && \
+    make && \
+    make install
+
+# Default command
+CMD ["/bin/bash"]
