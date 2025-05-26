@@ -1,4 +1,5 @@
-FROM debian:stable-slim
+FROM debian:bookworm
+LABEL maintainer="Solv Støy Teknikk"
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -24,10 +25,10 @@ RUN apt-get update && apt-get install -y \
     php-curl \
     php-xml \
     php-mbstring \
-        libgstreamer1.0-dev \
-        libgstreamer-plugins-base1.0-dev \
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/*
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
     # Clone the current git repository with submodules
     RUN git clone --recurse-submodules https://github.com/solv-stoy-teknikk/lsp-docker /opt/lsp-docker
 
@@ -39,7 +40,11 @@ WORKDIR /opt/lsp-docker/src/lsp-plugins
 RUN make config && \
     make fetch && \
     make && \
-    make install
+    make install && \
+    mkdir -p /opt/lsp-docker/build_output && \
+    cp -r .build/target/* /opt/lsp-docker/build_output/ && \
+    tar -czf /opt/lsp-docker/lsp-plugins.tar.gz -C /opt/lsp-docker/build_output .
 
 # Default command
 CMD ["/bin/bash"]
+

@@ -1,0 +1,57 @@
+# syntax=docker/dockerfile:1
+
+FROM ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
+
+# set version label
+ARG BUILD_DATE
+ARG CODIUM_VERSION
+ARG VERSION
+LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL maintainer="thelamer"
+
+# title
+ENV TITLE=VSCodium
+
+RUN \
+  echo "**** add icon ****" && \
+  curl -o \
+    /kclient/public/icon.png \
+    https://raw.githubusercontent.com/linuxserver/docker-templates/master/linuxserver.io/img/vscodium-icon.png && \
+  echo "**** install packages ****" && \
+  apt-get update && \
+  apt-get install --no-install-recommends -y \
+    chromium \
+    chromium-l10n \
+    git \
+    gnome-keyring \
+    ssh-askpass \
+    stterm \
+    thunar && \
+  echo "**** install codium ****" && \
+  if [ -z ${CODIUM_VERSION+x} ]; then \
+    CODIUM_VERSION=$(curl -sX GET "https://api.github.com/repos/VSCodium/vscodium/releases/latest" \
+    | awk '/tag_name/{print $4;exit}' FS='[""]'); \
+  fi && \
+  curl -o \
+    /tmp/codium.deb -L \
+    "https://github.com/VSCodium/vscodium/releases/download/${CODIUM_VERSION}/codium_${CODIUM_VERSION}_amd64.deb" && \
+  apt install --no-install-recommends -y /tmp/codium.deb && \
+  echo "**** container tweaks ****" && \
+  mv \
+    /usr/bin/chromium \
+    /usr/bin/chromium-real && \
+  printf "Linuxserver.io version: ${VERSION}\nBuild-date: ${BUILD_DATE}" > /build_version && \
+  echo "**** cleanup ****" && \
+  apt-get autoclean && \
+  rm -rf \
+    /var/lib/apt/lists/* \
+    /var/tmp/* \
+    /tmp/*
+
+# add local files
+COPY /root /
+
+# ports and volumes
+EXPOSE 3000
+
+VOLUME /config
