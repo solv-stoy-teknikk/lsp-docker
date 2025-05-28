@@ -1,5 +1,5 @@
 FROM debian:bookworm
-LABEL maintainer="Solv Støy Teknikk"
+LABEL maintainer="S Davis <sdavis@nativeit.net>"
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y \
@@ -27,23 +27,36 @@ RUN apt-get update && apt-get install -y \
     php-mbstring \
     libgstreamer1.0-dev \
     libgstreamer-plugins-base1.0-dev \
+    # Make dirs
+    && mkdir -p /build \
+    # Clean up apt cache
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Clone the current git repository with submodules
-RUN git clone --recurse-submodules https://github.com/solv-stoy-teknikk/lsp-docker /opt/lsp-docker
+# Set working directory
+WORKDIR /build
 
-    # Set working directory
-WORKDIR /opt/lsp-docker/src/lsp-plugins
+# Mount point for source code
+VOLUME ["/build"]
+
+# Clone the current git repository with submodules
+RUN git clone --recurse-submodules https://github.com/solv-stoy-teknikk/lsp-docker /build/lsp-docker
+
+# Set working directory
+WORKDIR /build/lsp-docker/src/lsp-plugins
 
 # Build the project
 RUN make config && \
     make fetch && \
     make && \
     make install && \
-    mkdir -p /opt/lsp-docker/build_output && \
-    cp -r .build/target/* /opt/lsp-docker/build_output/ && \
-    tar -czf /opt/lsp-docker/lsp-plugins.tar.gz -C /opt/lsp-docker/build_output .
-
+    mkdir -p /build/lsp-docker/output && \
+    mv -r ./build/target/* /build/lsp-docker/output/ && \
+    tar -czf /build/lsp-docker/output.tar.gz -C /build/lsp-docker/output .
+    make clean && \
+    git add /build/lsp-docker/output.tar.gz && \
+    git commit -m "Build output tarball" || true && \
+    git push origin main || true
 # Default command
+
 CMD ["/bin/bash"]
