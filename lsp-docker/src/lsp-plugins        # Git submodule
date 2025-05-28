@@ -1,4 +1,7 @@
+# Use the official Debian Bookworm as the base image
 FROM debian:bookworm
+
+# Set the maintainer label
 LABEL maintainer="Solv Støy Teknikk"
 
 # Install build dependencies
@@ -33,7 +36,7 @@ RUN apt-get update && apt-get install -y \
 # Clone the current git repository with submodules
 RUN git clone --recurse-submodules https://github.com/solv-stoy-teknikk/lsp-docker /opt/lsp-docker
 
-    # Set working directory
+# Set the working directory to the lsp-plugins source directory
 WORKDIR /opt/lsp-docker/src/lsp-plugins
 
 # Build the project
@@ -45,5 +48,5 @@ RUN make config && \
     cp -r .build/target/* /opt/lsp-docker/build_output/ && \
     tar -czf /opt/lsp-docker/lsp-plugins.tar.gz -C /opt/lsp-docker/build_output .
 
-# Default command
+# Default command to keep the container running
 CMD ["/bin/bash"]

@@ -49,3 +49,6 @@ docker-data/
 *.pid
 Dockerfile.local
 docker-compose*.local.yml
+
+# Build artifacts
+build_output/
