@@ -26,12 +26,12 @@ RUN apt-get update && apt-get install -y \
     php-xml \
     php-mbstring \
     libgstreamer1.0-dev \
-    libgstreamer-plugins-base1.0-dev \
+    libgstreamer-plugins-base1.0-dev && \
     # Make dirs
-    && mkdir -p /build \
+    mkdir -p /build && \
     # Clean up apt cache
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /build
@@ -53,10 +53,11 @@ RUN make config && \
     mkdir -p /build/lsp-docker/output && \
     mv -r ./build/target/* /build/lsp-docker/output/ && \
     tar -czf /build/lsp-docker/output.tar.gz -C /build/lsp-docker/output . && \
-    make clean && \
-    git add /build/lsp-docker/output.tar.gz && \
-    git commit -m "Build output tarball" || true && \
-    git push origin main || true
+    mv /build/lsp-docker/output.tar.gz /build/output.tar.gz && \
+    make clean
+    # git add /build/lsp-docker/output.tar.gz && \
+    # git commit -m "Build output tarball" || true && \
+    # git push origin main || true
 # Default command
 
 CMD ["/bin/bash"]
