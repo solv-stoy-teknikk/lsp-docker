@@ -52,7 +52,7 @@ RUN make config && \
     make install && \
     mkdir -p /build/lsp-docker/output && \
     mv -r ./build/target/* /build/lsp-docker/output/ && \
-    tar -czf /build/lsp-docker/output.tar.gz -C /build/lsp-docker/output .
+    tar -czf /build/lsp-docker/output.tar.gz -C /build/lsp-docker/output . && \
     make clean && \
     git add /build/lsp-docker/output.tar.gz && \
     git commit -m "Build output tarball" || true && \
